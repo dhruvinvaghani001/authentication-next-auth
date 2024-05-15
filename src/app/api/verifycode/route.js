@@ -13,7 +13,10 @@ export async function POST(request) {
       );
     }
     if (user.isVerified) {
-      return NextResponse.json({ message: "you are alredy verified!" });
+      return NextResponse.json(
+        { message: "you are alredy verified!" },
+        { status: 200 }
+      );
     }
     const userVerfifyCode = user.verifyCode;
 
