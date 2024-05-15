@@ -11,8 +11,22 @@ const userSchema = new Schema({
     required: true,
     unique: true,
   },
-  image: {
+  password: {
     type: String,
+  },
+  gooogleSignIn: {
+    type: Boolean,
+    default: false,
+  },
+  verifyCode: {
+    type: String,
+  },
+  verifyCodeExpiry: {
+    type: Date,
+  },
+  isVerified: {
+    type: Boolean,
+    default: false,
   },
 });
 
