@@ -38,9 +38,17 @@ const handler = NextAuth({
           const user = await User.create({
             email: profile.email,
             username: profile.name,
-            image: profile.picture,
+            googleSignIn: true,
+            isVerified: true,
           });
+          console.log(user);
         }
+        // if (existUser) {
+        //   if (!existUser.googleSignIn) {
+        //     throw new Error("custom error to the client");
+        //     return false;
+        //   }
+        // }
         return true;
       } catch (error) {
         return false;

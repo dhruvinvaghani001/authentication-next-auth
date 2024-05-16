@@ -14,7 +14,7 @@ const userSchema = new Schema({
   password: {
     type: String,
   },
-  gooogleSignIn: {
+  googleSignIn: {
     type: Boolean,
     default: false,
   },
