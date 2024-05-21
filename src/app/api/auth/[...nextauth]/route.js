@@ -3,6 +3,7 @@ import NextAuth from "next-auth";
 import GoogleProviders from "next-auth/providers/google";
 import User from "@/models/user.model";
 import CredentialsProvider from "next-auth/providers/credentials";
+import bcrypt from "bcrypt";
 
 const handler = NextAuth({
   providers: [
@@ -12,6 +13,7 @@ const handler = NextAuth({
     }),
     CredentialsProvider({
       type: "credentials",
+      name: "credentials",
       credentials: {
         email: {
           label: "Email",
@@ -20,40 +22,52 @@ const handler = NextAuth({
         },
         password: { label: "password", type: "password" },
       },
-      async authorize(credentials, req) {},
+      async authorize(credentials, req) {
+        const email = credentials.email;
+        const password = credentials.password;
+        await connectDB();
+        const user = await User.findOne({ email });
+        console.log(user);
+        if (!user) {
+          throw new Error("user does not exist!");
+        }
+        if (!user.isVerified) {
+          throw new Error("you are not verified !");
+        }
+        console.log(password);
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        console.log("passcheck" + isPasswordCorrect);
+        if (!isPasswordCorrect) {
+          throw new Error("Password is wrong!");
+        }
+        return user;
+      },
     }),
   ],
   callbacks: {
-    async session({ session }) {
-      const sessionUser = await User.findOne({ email: session.user.email });
-      session.user.id = sessionUser._id;
+    async jwt({ token, user }) {
+      if (user) {
+        token._id = user._id.toString();
+        token.email = user.email;
+        token.username = user.username;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user._id = token._id;
+        session.user.email = token.email;
+        session.user.username = token.username;
+      }
       return session;
     },
-    async signIn({ profile }) {
-      console.log(profile);
-      await connectDB();
-      try {
-        const existUser = await User.findOne({ email: profile.email });
-        if (!existUser) {
-          const user = await User.create({
-            email: profile.email,
-            username: profile.name,
-            googleSignIn: true,
-            isVerified: true,
-          });
-          console.log(user);
-        }
-        // if (existUser) {
-        //   if (!existUser.googleSignIn) {
-        //     throw new Error("custom error to the client");
-        //     return false;
-        //   }
-        // }
-        return true;
-      } catch (error) {
-        return false;
-      }
-    },
+  },
+  pages: {
+    signIn: "/signin",
+  },
+  session: {
+    strategy: "jwt",
+    maxAge: 24 * 60 * 60,
   },
 });
 
