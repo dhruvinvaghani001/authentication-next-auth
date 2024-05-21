@@ -62,12 +62,14 @@ const handler = NextAuth({
       return session;
     },
   },
-  pages: {
-    signIn: "/signin",
-  },
+
   session: {
     strategy: "jwt",
     maxAge: 24 * 60 * 60,
+  },
+  secret: process.env.NEXT_AUTH_SECRET,
+  pages: {
+    signIn: "/signin",
   },
 });
 
