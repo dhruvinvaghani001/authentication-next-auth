@@ -2,13 +2,17 @@
 
 import { useSession, signIn, signOut } from "next-auth/react";
 import { SessionProvider } from "next-auth/react";
+import { Toaster } from "react-hot-toast";
 
 export default function Home() {
   const { data: session, status } = useSession();
   console.log(session);
   return (
-    // <SessionProvider session={session}>
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
+      <div>
+        <Toaster />
+      </div>
+
       <div className="flex flex-col gap-10">
         {session && (
           <h1 className="text-white font-thin">{session.user.name}</h1>
