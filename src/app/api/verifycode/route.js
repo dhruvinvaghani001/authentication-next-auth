@@ -1,11 +1,13 @@
+import connectDB from "@/db/connect";
 import User from "@/models/user.model";
 import { NextResponse } from "next/server";
 
 export async function POST(request) {
   try {
-    const { email, verifyCode } = await request.json();
+    await connectDB();
+    const { username, verifyCode } = await request.json();
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ username });
     if (!user) {
       return NextResponse.json(
         { message: "user does not exist !" },
@@ -26,7 +28,7 @@ export async function POST(request) {
       user.isVerified = true;
       await user.save();
       return NextResponse.json(
-        { message: "you are now verified" },
+        { message: "verify successfully !" },
         { status: 200 }
       );
     }
@@ -46,11 +48,12 @@ export async function POST(request) {
           message: "verify code expire!",
         },
         {
-          status: 400,
+          status: 403,
         }
       );
     }
   } catch (error) {
+    console.log(error);
     return NextResponse.json({ message: error }, { status: 400 });
   }
 }

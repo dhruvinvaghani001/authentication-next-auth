@@ -6,23 +6,36 @@ import { sendEmail } from "@/utills/mailer";
 
 connectDB();
 
-export async function POST(request) {
+export async function POST(req) {
   try {
-    const reqBody = await request.json();
-    const { username, email, password } = reqBody;
+    const reqData = await req.json();
+    const { username, email, password } = reqData;
 
-    const existingUser = await User.findOne({
-      $or: [{ username: username, email: email }],
-    });
+    console.log(username, email, password);
+    const existUserPipeline = [
+      {
+        $match: {
+          $or: [
+            {
+              username: username,
+            },
+            {
+              email: email,
+            },
+          ],
+        },
+      },
+    ];
+    const existedUser = await User.aggregate(existUserPipeline);
 
-    console.log(existingUser);
-
-    if (existingUser) {
+    if (existedUser.length > 0) {
+      console.log("hello");
       return NextResponse.json(
-        { message: "user alredy exists with this username or email !" },
-        { status: 400 }
+        { message: "user alredy exist" },
+        { status: 409 }
       );
     }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPass = await bcrypt.hash(password, salt);
 
@@ -52,10 +65,13 @@ export async function POST(request) {
     console.log("send email res :", reponse);
 
     return NextResponse.json(
-      { message: "user is created ! verify code for the login" },
+      {
+        message: "user is created ! verify code for the login",
+        username: createdUser.username,
+      },
       { status: 200 }
     );
   } catch (error) {
-    return NextResponse.json({ message: error }, { status: 400 });
+    return NextResponse.json({ message: error }, { status: 500 });
   }
 }
