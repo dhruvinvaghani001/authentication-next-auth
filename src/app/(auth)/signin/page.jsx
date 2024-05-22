@@ -1,7 +1,7 @@
 import AuthForm from "@/components/auth/AuthForm";
 import React from "react";
 
-const page = () => {
+const SigninPage = () => {
   return (
     <div className="w-full h-[100vh]  flex items-center">
       <section className="w-full">
@@ -20,4 +20,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default SigninPage;
