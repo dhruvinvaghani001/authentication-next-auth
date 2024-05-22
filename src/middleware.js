@@ -24,10 +24,8 @@ export async function middleware(request) {
         console.log(res.data.data);
         console.log(userIsVerified);
         if (userIsVerified) {
-          console.log("hello");
           return NextResponse.redirect(new URL("/", request.nextUrl));
         } else {
-          console.log("rej");
           return NextResponse.next();
         }
       }
