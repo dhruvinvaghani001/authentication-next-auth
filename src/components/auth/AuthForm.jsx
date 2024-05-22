@@ -21,6 +21,14 @@ const AuthForm = ({ type }) => {
   } = form;
   const router = useRouter();
 
+  const handleGoogleSignin = async () => {
+    const result = await signIn("google");
+    console.log(result); // Redirect to home page after sign-in
+    if (result.error) {
+      toast.error(result.error);
+    }
+  };
+
   const onSubmit = async (data) => {
     if (isLoginForm) {
       try {
@@ -104,9 +112,26 @@ const AuthForm = ({ type }) => {
             <p className="text-red-500 mt-1">{errors.password.message}</p>
           )}
         </div>
-        <Button type="submit">
+        <Button type="submit" className=" bg-violet-600 hover:bg-violet-700  ">
           {isLoginForm ? "Login" : "Create a Account"}
         </Button>
+        <div>
+          {isLoginForm && (
+            <Button
+              className="px-4 py-2 border flex gap-2 border-slate-200 dark:border-slate-700 rounded-lg text-slate-700 dark:text-slate-200 hover:border-slate-400 dark:hover:border-slate-500 hover:text-slate-900 dark:hover:text-slate-300 hover:shadow transition duration-150 bg-white hover:bg-gray-100"
+              type="button"
+              onClick={handleGoogleSignin}
+            >
+              <img
+                className="w-6 h-6"
+                src="https://www.svgrepo.com/show/475656/google-color.svg"
+                loading="lazy"
+                alt="google logo"
+              />
+              <span className="text-black">Sign in with Google</span>
+            </Button>
+          )}
+        </div>
         <p className="text-sm font-light text-gray-500 dark:text-gray-400">
           {isLoginForm ? "Don't have an account? " : "Already have an account?"}
           <Link

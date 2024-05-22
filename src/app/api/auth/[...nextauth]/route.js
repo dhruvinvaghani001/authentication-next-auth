@@ -34,7 +34,6 @@ const handler = NextAuth({
         if (!user.isVerified) {
           throw new Error("you are not verified !");
         }
-        console.log(password);
         const isPasswordCorrect = await bcrypt.compare(password, user.password);
         console.log("passcheck" + isPasswordCorrect);
         if (!isPasswordCorrect) {
@@ -47,19 +46,50 @@ const handler = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token._id = user._id.toString();
+        token._id = user?._id?.toString();
         token.email = user.email;
         token.username = user.username;
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token, user }) {
+      await connectDB();
+      const sessionUser = await User.findOne({ email: session.user.email });
       if (token) {
         session.user._id = token._id;
         session.user.email = token.email;
         session.user.username = token.username;
       }
+      if (sessionUser) {
+        session.user._id = sessionUser._id;
+      }
       return session;
+    },
+    async signIn({ profile, account }) {
+      if (account.provider === "google") {
+        try {
+          await connectDB();
+
+          const existingUser = await User.findOne({ email: profile.email });
+          if (existingUser && !existingUser.googleSignIn) {
+            throw new Error("user is not google signup use credential !");
+          }
+          if (!existingUser) {
+            // Create a new user
+            const newUser = new User({
+              username: profile.name.trim(),
+              email: profile.email,
+              isVerified: true,
+              googleSignIn: true,
+            });
+            await newUser.save();
+          }
+        } catch (error) {
+          console.log(error.message);
+          return Promise.reject(new Error(error.message));
+        }
+      }
+      return true;
     },
   },
 
@@ -67,7 +97,7 @@ const handler = NextAuth({
     strategy: "jwt",
     maxAge: 24 * 60 * 60,
   },
-  secret: process.env.NEXT_AUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/signin",
   },
