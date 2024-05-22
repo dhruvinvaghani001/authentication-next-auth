@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 import { useForm } from "react-hook-form";
@@ -23,10 +23,6 @@ const AuthForm = ({ type }) => {
 
   const handleGoogleSignin = async () => {
     const result = await signIn("google");
-    console.log(result); // Redirect to home page after sign-in
-    if (result.error) {
-      toast.error(result.error);
-    }
   };
 
   const onSubmit = async (data) => {
@@ -37,12 +33,27 @@ const AuthForm = ({ type }) => {
           password: data.password,
           redirect: false,
         });
+
+        const resData = await axios.post("/api/userbyemail", {
+          email: data.email,
+        });
+        const username = resData.data.data;
         if (!res.ok) {
+          if (res.error == "you are not verified !") {
+            const resData = await axios.post("/api/userbyemail", {
+              email: data.email,
+            });
+            const { username } = resData.data.data;
+            toast.error(res.error);
+            router.push(`/verify/${username}`);
+            return;
+          }
           toast.error(res.error);
         }
         if (res.ok) {
           toast.success("User loged in Successfully!");
           router.push("/");
+          return;
         }
       } catch (error) {
         toast.error(error);

@@ -32,6 +32,18 @@ const VerifyCode = ({ params }) => {
     }
   };
 
+  const resendVerifyCode = async () => {
+    const username = params.username;
+    try {
+      const response = await axios.post("/api/resendcode", {
+        username,
+      });
+      toast.success(response.data.message, { duration: 2500 });
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
+
   return (
     <div className="w-full h-[100vh]  flex items-center">
       <Toaster />
@@ -56,11 +68,19 @@ const VerifyCode = ({ params }) => {
                     <p className="mt-1 text-red-700">{errors.code.message}</p>
                   )}
                 </div>
+
                 <Button
                   type="submit"
                   className="bg-violet-600 hover:bg-violet-700  "
                 >
                   Verify
+                </Button>
+                <Button
+                  type="button"
+                  className="bg-violet-600 hover:bg-violet-700"
+                  onClick={resendVerifyCode}
+                >
+                  Resend Code
                 </Button>
               </form>
             </div>
