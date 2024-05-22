@@ -56,7 +56,12 @@ const VerifyCode = ({ params }) => {
                     <p className="mt-1 text-red-700">{errors.code.message}</p>
                   )}
                 </div>
-                <Button type="submit">Verify</Button>
+                <Button
+                  type="submit"
+                  className="bg-violet-600 hover:bg-violet-700  "
+                >
+                  Verify
+                </Button>
               </form>
             </div>
           </div>
