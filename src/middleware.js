@@ -1,10 +1,6 @@
 export { default } from "next-auth/middleware";
-import { User } from "lucide-react";
-import { connect } from "mongoose";
 import { getToken } from "next-auth/jwt";
 import { NextResponse } from "next/server";
-import connectDB from "./db/connect";
-import axios from "axios";
 
 export async function middleware(request) {
   const token = await getToken({ req: request });
