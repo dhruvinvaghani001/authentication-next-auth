@@ -16,7 +16,7 @@ export async function middleware(request) {
   if (path.startsWith("/verify") && !token) {
     const username = path.split("/")[2];
     try {
-      const res = await axios.post("http://localhost:3000/api/user", {
+      const res = await axios.post("/api/user", {
         username,
       });
       if (res.statusText == "OK") {

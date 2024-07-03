@@ -23,13 +23,16 @@ export default function Home() {
         >
           Sign out
         </button>
-
-        <button
-          className="p-4 bg-violet-700 rounded-lg"
-          onClick={() => signIn("google")}
-        >
-          Sign in with Google
-        </button>
+        {session && (
+          <>
+            <button className="bg-violet-700 rounded-xl p-4">
+              {session?.user?.email}
+            </button>
+            <button className="bg-violet-700 rounded-xl p-4">
+              {session?.user?.username}
+            </button>
+          </>
+        )}
       </div>
     </main>
   );
